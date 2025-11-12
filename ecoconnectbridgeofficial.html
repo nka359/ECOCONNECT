@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>EcoConnect Bridge — Powering Journeys, Sustaining Tomorrow</title>
+<meta name="description" content="EcoConnect Bridge: horizontal multi-panel website showcasing solar canopies, wind micro-turbines, piezo tiles and wireless charging lanes."/>
+<style>
+/* ===== Reset & base ===== */
+:root{
+  --bg1:#f0fff7; --bg2:#f7f3ff;
+  --deep:#063b33; --muted:#3c6b62;
+  --accent1:#07c77a; --accent2:#39d0ff; --accent3:#8a6cff; --accent4:#ff66b2;
+  --panel-white: #ffffff;
+  --glass: rgba(255,255,255,0.82);
+  --maxw:1200px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, Poppins, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:linear-gradient(135deg,var(--bg1),var(--bg2)); color:var(--deep); -webkit-font-smoothing:antialiased}
+a{color:inherit}
+
+/* ===== Layout: horizontal panels ===== */
+.site {
+  position:relative; height:100vh; overflow:hidden;
+  display:flex; flex-direction:row; align-items:stretch;
+  width:100vw;
+}
+/* container that scrolls horizontally (we animate transform) */
+.panels {
+  height:100%; display:flex; transition:transform 0.8s cubic-bezier(.2,.9,.2,1);
+  will-change: transform;
+}
+.panel {
+  min-width:100vw; height:100vh; padding:28px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  position:relative; overflow:auto;
+}
+
+/* header overlay */
+.header {
+  position:fixed; left:0; right:0; top:0; height:72px; display:flex; align-items:center; justify-content:center; z-index:1200;
+  background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+  backdrop-filter: blur(6px); box-shadow:0 6px 20px rgba(3,22,18,0.04);
+}
+.header-inner { width:100%; max-width:var(--maxw); padding:10px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 auto;}
+.brand { display:flex; align-items:center; gap:12px}
+.logo { width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; background:linear-gradient(135deg,var(--accent1),var(--accent2)); box-shadow:0 8px 26px rgba(7,199,122,0.12)}
+.brand h1{font-size:16px;margin:0;color:var(--deep)}
+.brand p{font-size:12px;margin:0;color:var(--muted)}
+
+/* nav links */
+.top-nav { display:flex; gap:8px; align-items:center}
+.top-nav a { padding:8px 12px; border-radius:10px; text-decoration:none; color:var(--muted); font-weight:700; font-size:13px }
+.top-nav a.active { background:rgba(6,58,51,0.06); color:var(--deep) }
+
+/* header controls */
+.header-controls { display:flex; gap:8px; align-items:center}
+.toggle { padding:6px 10px; border-radius:10px; background:linear-gradient(90deg,var(--accent3),var(--accent4)); color:white; font-weight:700; border:none; cursor:pointer}
+
+/* navigation dots (vertical right) */
+.dots { position:fixed; right:18px; top:50%; transform:translateY(-50%); z-index:1200; display:flex; flex-direction:column; gap:8px }
+.dot { width:12px; height:12px; border-radius:50%; background:rgba(2,10,8,0.12); cursor:pointer; box-shadow:inset 0 -2px 0 rgba(0,0,0,0.06) }
+.dot.active { background:linear-gradient(90deg,var(--accent1),var(--accent2)); box-shadow:0 6px 18px rgba(63,188,141,0.18) }
+
+/* arrows */
+.controls { position:fixed; left:18px; bottom:18px; z-index:1200; display:flex; gap:10px}
+.arrow { width:44px;height:44px;border-radius:10px;background:var(--panel-white);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 26px rgba(3,22,18,0.08);cursor:pointer;font-weight:800}
+
+/* ===== Panel content styling ===== */
+.panel-inner { width:100%; max-width:var(--maxw); margin:6vh auto; padding:18px; display:flex; gap:20px; align-items:flex-start; justify-content:space-between; }
+.left, .right { flex:1; min-width:320px }
+.hero-title { font-size:36px; line-height:1.02; margin:0 0 12px 0; color:var(--deep) }
+.lead { color:var(--muted); font-size:16px; line-height:1.55; margin-bottom:14px }
+.small { color:var(--muted); font-size:14px }
+
+/* card styles */
+.card { background:var(--panel-white); border-radius:14px; padding:16px; box-shadow:0 18px 44px rgba(3,22,18,0.06) }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:12px }
+.feature { display:flex; gap:12px; align-items:flex-start }
+.feature svg { width:44px;height:44px; flex-shrink:0 }
+
+/* gallery thumbs */
+.gallery { display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; }
+.thumb { width:320px; height:220px; border-radius:12px; overflow:hidden; cursor:pointer; border:6px solid rgba(255,255,255,0.9); box-shadow:0 12px 30px rgba(3,22,18,0.06) }
+.thumb img { width:100%; height:100%; object-fit:cover; display:block }
+
+/* poster SVG container */
+.poster-svg { max-width:780px; width:100%; border-radius:12px; box-shadow:0 18px 40px rgba(3,22,18,0.08); background:white; padding:12px }
+
+/* responsive adjustments */
+@media (max-width:980px){
+  .panel-inner { flex-direction:column; }
+  .grid-3 { grid-template-columns:1fr 1fr; }
+  .thumb { width:100%; height:200px }
+}
+
+/* ===== Background animations (both subtle + dynamic, tasteful) ===== */
+.bg-wrap { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.gradient-bg { position:absolute; inset:-20% -20%; background:linear-gradient(45deg, rgba(7,199,122,0.12), rgba(57,208,255,0.10), rgba(138,108,255,0.08), rgba(255,102,178,0.06)); filter:blur(40px); transform:rotate(10deg); animation:gradientShift 24s linear infinite; opacity:0.95 }
+@keyframes gradientShift { 0%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-8%) rotate(6deg)} 100%{transform:translateY(0) rotate(0)} }
+
+/* subtle particle overlay */
+.particles { position:absolute; inset:0; }
+
+/* leaf style (SVGs move via JS) */
+.leaf { position:absolute; width:48px; height:48px; opacity:0.95; transform-origin:center; will-change: transform, opacity; filter:drop-shadow(0 6px 14px rgba(3,30,22,0.12)) }
+
+/* energy wave pulses */
+.pulse { position:absolute; border-radius:999px; pointer-events:none; opacity:0.12; background:radial-gradient(circle at center, rgba(57,208,255,0.25), rgba(7,199,122,0.12), transparent); transform:scale(0.8); animation:wave 2.8s ease-out infinite; }
+@keyframes wave { 0%{transform:scale(0.6); opacity:0.28} 100%{transform:scale(2.8); opacity:0} }
+
+/* lightbox */
+.lightbox { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,10,8,0.7); z-index:1500 }
+.lightbox .box { background:white; padding:12px; border-radius:10px; max-width:1100px; width:94% }
+.lightbox img { width:100%; height:auto; display:block }
+
+/* footer small */
+.panel-footer { margin-top:18px; color:var(--muted); font-size:13px }
+
+/* subtle accessibility focus */
+a:focus, button:focus { outline:3px solid rgba(7,199,122,0.18); outline-offset:2px }
+
+/* tiny helper */
+.kv { font-weight:700; color:var(--deep) }
+</style>
+</head>
+<body>
+
+<!-- Background layers -->
+<div class="bg-wrap" aria-hidden="true">
+  <div class="gradient-bg"></div>
+  <canvas id="leaf-canvas" class="particles"></canvas>
+  <!-- a few pulsing energy spots -->
+  <div id="pulse1" class="pulse" style="width:120px;height:120px;left:10%;top:40%;"></div>
+  <div id="pulse2" class="pulse" style="width:160px;height:160px;left:70%;top:22%;animation-delay:0.6s;"></div>
+</div>
+
+<!-- header -->
+<header class="header" role="banner">
+  <div class="header-inner">
+    <div class="brand" role="img" aria-label="EcoConnect Bridge logo">
+      <div class="logo">EC</div>
+      <div>
+        <h1>EcoConnect Bridge</h1>
+        <p>Where motion transforms into clean power</p>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px">
+      <nav class="top-nav" role="navigation" aria-label="Main">
+        <a href="#" data-index="0" class="nav-link active">Home</a>
+        <a href="#" data-index="1" class="nav-link">Our Aim</a>
+        <a href="#" data-index="2" class="nav-link">Features</a>
+        <a href="#" data-index="3" class="nav-link">Functions</a>
+        <a href="#" data-index="4" class="nav-link">Inputs</a>
+        <a href="#" data-index="5" class="nav-link">Gallery</a>
+        <a href="#" data-index="6" class="nav-link">SDGs</a>
+        <a href="#" data-index="7" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="header-controls" style="margin-left:12px">
+        <button id="animToggle" class="toggle" title="Toggle animation intensity">Dynamic</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- navigation dots -->
+<div class="dots" role="tablist" aria-orientation="vertical">
+  <div class="dot active" data-index="0" aria-label="Home"></div>
+  <div class="dot" data-index="1" aria-label="Our Aim"></div>
+  <div class="dot" data-index="2" aria-label="Features"></div>
+  <div class="dot" data-index="3" aria-label="Functions"></div>
+  <div class="dot" data-index="4" aria-label="Inputs"></div>
+  <div class="dot" data-index="5" aria-label="Gallery"></div>
+  <div class="dot" data-index="6" aria-label="SDGs"></div>
+  <div class="dot" data-index="7" aria-label="Contact"></div>
+</div>
+
+<!-- arrow controls -->
+<div class="controls" aria-hidden="true">
+  <div class="arrow" id="prevBtn" title="Previous">◀</div>
+  <div class="arrow" id="nextBtn" title="Next">▶</div>
+</div>
+
+<!-- panels container -->
+<div class="site" role="main" aria-label="EcoConnect Bridge site">
+  <div class="panels" id="panels">
+
+    <!-- Panel 0: Home -->
+    <section class="panel" id="p-home" aria-labelledby="t-home" role="region">
+      <div class="panel-inner">
+        <div class="left">
+          <div style="max-width:760px">
+            <h2 class="hero-title">Powering Journeys — Sustaining Tomorrow</h2>
+            <p class="lead">EcoConnect Bridge turns ordinary bridges into active renewable-energy hubs by combining solar canopies, vertical micro-wind turbines, piezoelectric tiles and wireless charging lanes. It charges vehicles on the move and feeds clean power into the local grid.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+              <button class="btn btn--green" onclick="goTo(1)">Our Aim</button>
+              <button class="btn btn--blue" onclick="goTo(2)">Features</button>
+              <button class="btn" style="background:linear-gradient(90deg,var(--accent3),var(--accent4));color:white" onclick="goTo(5)">Gallery & Poster</button>
+            </div>
+
+            <div style="margin-top:18px" class="card">
+              <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+                <div><span class="kv">Pilot cost</span><div class="small">₹20L–₹30L (solar-lane MVP)</div></div>
+                <div><span class="kv">Impact</span><div class="small">Lower emissions · Better EV adoption</div></div>
+                <div><span class="kv">SDGs</span><div class="small">7 · 9 · 11 · 13</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card" style="width:420px">
+            <!-- tasteful schematic / animated mini SVG -->
+            <div style="text-align:center">
+              <svg viewBox="0 0 900 500" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#7ef7c9"/><stop offset="1" stop-color="#39d0ff"/></linearGradient></defs>
+                <rect width="900" height="500" fill="url(#g1)" opacity="0.06"/>
+                <g transform="translate(0,160)">
+                  <path d="M40 220 C160 40 740 40 860 220" fill="#022" opacity="0.6"/>
+                  <rect x="40" y="220" width="820" height="24" rx="12" fill="#053" />
+                </g>
+                <!-- solar icons -->
+                <g transform="translate(130,250)">
+                  <rect width="64" height="12" fill="#0cf" rx="2" transform="rotate(-6 32 6)"/>
+                  <rect x="120" width="64" height="12" fill="#0cf" rx="2" transform="rotate(-3 32 6)"/>
+                </g>
+              </svg>
+              <div class="small" style="margin-top:8px">Schematic: solar lanes + charging coils + energy storage</div>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+          <div class="card small">
+            <strong>Try navigation:</strong> keyboard ← →, click arrows or dots, or swipe on mobile.
+          </div>
+        </div>
+      </div>
+
+      <div style="width:100%; max-width:var(--maxw); margin:22px auto; display:flex; gap:12px; justify-content:space-between; align-items:center;">
+        <div class="small">Made by Team EcoConnect • Designed to be affordable, scalable, and community-first.</div>
+        <div><a href="#" onclick="downloadBrief(); return false" style="text-decoration:none; padding:8px 12px; border-radius:10px; background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:white; font-weight:700;">Download Brief</a></div>
+      </div>
+
+    </section>
+
+    <!-- Panel 1: Our Aim -->
+    <section class="panel" id="p-aim" aria-labelledby="t-aim" role="region">
+      <div class="panel-inner">
+        <div class="left">
+          <div class="card">
+            <h2>Our Aim</h2>
+            <p class="lead">EcoConnect Bridge exists to show how everyday infrastructure can become productive — generating clean energy while serving transport. Our pilot goal is to demonstrate a cost-effective lane-level solar + wireless charging strip with storage, then scale to full bridge corridors.</p>
+
+            <h4 style="margin-top:12px">Goals</h4>
+            <ul class="small">
+              <li>Deploy an affordable pilot (₹20L–₹30L) to validate tech and user acceptance.</li>
+              <li>Reduce urban transport emissions and improve EV adoption by reducing charging stops.</li>
+              <li>Engage communities — visible green infrastructure increases public support for renewables.</li>
+              <li>Open-source the design so cities can replicate it.</li>
+            </ul>
+
+            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn--green" onclick="goTo(2)">See Features</button>
+              <button class="btn btn--blue" onclick="goTo(5)">View Poster & Model</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card poster-svg" aria-hidden="true">
+            <!-- Small poster preview (same poster is downloadable in Gallery) -->
+            <svg viewBox="0 0 780 1100" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" role="img">
+              <defs><linearGradient id="pg" x1="0" x2="1"><stop offset="0" stop-color="#07c77a"/><stop offset="1" stop-color="#39d0ff"/></linearGradient></defs>
+              <rect width="780" height="1100" fill="#fff" rx="12"/>
+              <text x="48" y="86" font-size="28" font-weight="700" fill="#063b33">EcoConnect Bridge</text>
+              <text x="48" y="116" font-size="14" fill="#476d63">Powering journeys — sustaining tomorrow</text>
+
+              <!-- bridge illustration -->
+              <g transform="translate(48,170)">
+                <path d="M0 330 C96 40 584 40 680 330" stroke="#064739" stroke-width="8" fill="none" stroke-linecap="round"/>
+                <rect x="6" y="330" rx="24" width="740" height="42" fill="url(#pg)"/>
+                <g transform="translate(120,300)" fill="#063">
+                  <rect x="0" y="-24" width="64" height="12" rx="2"/>
+                  <rect x="150" y="-28" width="64" height="12" rx="2"/>
+                  <rect x="300" y="-32" width="64" height="12" rx="2"/>
+                </g>
+              </g>
+
+              <g transform="translate(48,540)" fill="#234f44">
+                <text x="0" y="0" font-size="18" font-weight="700">What it does</text>
+                <text x="0" y="40" font-size="14">• Harvests solar, wind & motion</text>
+                <text x="0" y="70" font-size="14">• Stores energy & supplies grid</text>
+                <text x="0" y="100" font-size="14">• Charges EVs wirelessly while moving</text>
+              </g>
+
+              <rect x="48" y="800" rx="10" width="684" height="120" fill="#07c77a"/>
+              <text x="72" y="865" font-size="20" fill="#fff" font-weight="700">Join the pilot — build cleaner routes</text>
+              <text x="72" y="896" font-size="12" fill="#e9fff0">Contact: ecoconnect@example.org</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer small">Aim explained — practical, community-driven, and replicable.</div>
+    </section>
+
+    <!-- Panel 2: Features -->
+    <section class="panel" id="p-features" aria-labelledby="t-features" role="region">
+      <div class="panel-inner">
+        <div class="left">
+          <div class="card">
+            <h2>Features</h2>
+            <div class="grid-3">
+              <div class="card feature">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="#ffd84d"/></svg>
+                <div><h4>Solar Canopies</h4><div class="small muted">High-efficiency photovoltaic panels on canopies and rails capture sunlight for live charging and storage.</div></div>
+              </div>
+
+              <div class="card feature">
+                <svg viewBox="0 0 24 24"><path d="M12 2v20" stroke="#39d0ff" stroke-width="1.6"/></svg>
+                <div><h4>Wind Micro-Turbines</h4><div class="small muted">Vertical-axis micro-turbines along railings capture cross-wind for night/cloudy generation.</div></div>
+              </div>
+
+              <div class="card feature">
+                <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" fill="#7ef7c9"/></svg>
+                <div><h4>Piezoelectric Tiles</h4><div class="small muted">Durable tiles in lanes harvest kinetic energy and glow for safety at night.</div></div>
+              </div>
+            </div>
+
+            <div class="grid-3" style="margin-top:12px">
+              <div class="card feature"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/></svg><div><h4>Wireless Charging Lanes</h4><div class="small muted">Inductive coils in road transfer power to vehicle receivers as they pass.</div></div></div>
+
+              <div class="card feature"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="#e6f7ff"/></svg><div><h4>Energy Storage</h4><div class="small muted">Batteries & supercapacitors hold energy for immediate supply and smoothing.</div></div></div>
+
+              <div class="card feature"><svg viewBox="0 0 24 24"><path d="M3 6h18" stroke="#7ef7c9"/></svg><div><h4>Smart Control</h4><div class="small muted">AI-managed orchestration balances charging, storage and grid export for efficiency & safety.</div></div></div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card">
+            <h3>Why these features?</h3>
+            <p class="small muted">The combination provides continuous, distributed generation. Solar and wind capture primary energy; piezo adds consistent kinetic capture; storage and smart control make delivery reliable. Wireless lanes give the highest user-value (reduced stops) but need receiver retrofits in vehicles.</p>
+
+            <div style="margin-top:12px" class="small muted">
+              <strong>Note:</strong> pieces can be phased: start with solar lane + battery + one wireless strip → expand with turbines and piezo tiles.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-footer small">Features designed for practical deployment and scale.</div>
+    </section>
+
+    <!-- Panel 3: Functions & Workings -->
+    <section class="panel" id="p-functions" aria-labelledby="t-functions" role="region">
+      <div class="panel-inner">
+        <div class="left">
+          <div class="card">
+            <h2>How the Bridge Works</h2>
+            <ol class="small" style="margin-left:16px">
+              <li><strong>Collect:</strong> PV arrays, micro-turbines & piezo tiles generate DC power.</li>
+              <li><strong>Condition:</strong> Inverters, MPPT, and power electronics condition & harmonize power.</li>
+              <li><strong>Store:</strong> Energy goes into modular battery banks and supercapacitors for fast bursts.</li>
+              <li><strong>Manage:</strong> BMS + EMS (AI logic) prioritizes lane charging, infrastructure needs, or grid export.</li>
+              <li><strong>Transfer:</strong> Inductive coils produce AC magnetic fields; vehicle receivers convert to DC and charge batteries while moving.</li>
+              <li><strong>Safety & Comm:</strong> Sensors, temperature monitors, and OCPP-like comms ensure safe operations and telemetry.</li>
+            </ol>
+
+            <h4 style="margin-top:12px">Vehicle requirements</h4>
+            <p class="small muted">Vehicles need compatible inductive receivers for in-motion charging. Public buses and city fleets can be prioritized for retrofits to maximize benefit early in pilots.</p>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card">
+            <h3>Technical Outputs</h3>
+            <div class="small muted">
+              <ul>
+                <li>Real-time energy metrics (kW, kWh), vehicle charge logs.</li>
+                <li>Power exported to local grid or microgrid node.</li>
+                <li>Reduced idling & range-stress for EVs.</li>
+                <li>Community benefits: street-lighting, bus-stop power, emergency backup.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style="height:12px"></div>
+          <div class="card small muted">
+            <strong>Maintenance:</strong> modular panels & replaceable tiles mean lower long-term O&M.
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer small">Functions explained — from capture to charge.</div>
+    </section>
+
+    <!-- Panel 4: Inputs & Outputs -->
+    <section class="panel" id="p-io" aria-labelledby="t-io" role="region">
+      <div class="panel-inner">
+        <div class="left">
+          <div class="card">
+            <h2>Inputs & Outputs</h2>
+            <h4>Inputs</h4>
+            <ul class="small">
+              <li>Sunlight for PV arrays</li>
+              <li>Wind for micro-turbines</li>
+              <li>Vehicle motion for piezoelectric tiles</li>
+              <li>Grid connection for balancing & import/export</li>
+            </ul>
+
+            <h4 style="margin-top:10px">Outputs</h4>
+            <ul class="small">
+              <li>Electricity for wireless charging lanes (kW)</li>
+              <li>Power for bridge systems (lighting, sensors)</li>
+              <li>Surplus export to local grid or community microgrids</li>
+              <li>Telemetry & energy usage data</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card">
+            <h3>Expected benefits</h3>
+            <p class="small muted">Lower city emissions, stronger EV adoption, less strain on centralized grids during peak times, and local resilience with battery backup.</p>
+
+            <h4 style="margin-top:12px">Affordability</h4>
+            <p class="small muted">Phased rollouts reduce upfront cost. Target first retrofits on high-usage bus lanes and short demonstration bridges to show ROI and gather data.</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer small">Inputs → smart use → impactful outputs.</div>
+    </section>
+
+    <!-- Panel 5: Gallery & Poster (with poster SVG & model images) -->
+    <section class="panel" id="p-gallery" aria-labelledby="t-gallery" role="region">
+      <div class="panel-inner">
+        <div class="left">
+          <div class="card">
+            <h2>Gallery & Poster</h2>
+            <p class="small muted">Download the poster (SVG) or view model photos. Replace placeholder images with your real pictures in the assets folder when hosting.</p>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+              <a class="btn btn--green" href="#" onclick="downloadPoster(); return false">Download Poster (SVG)</a>
+              <a class="btn btn--blue" href="#" onclick="openLightbox('data:image/svg+xml;utf8,' + encodeURIComponent(posterSVG), 'EcoConnect Poster'); return false">View Poster</a>
+            </div>
+
+            <div class="gallery" style="margin-top:12px">
+              <div class="thumb" onclick="openLightbox('C:\Users\hp\Downloads\eco pic 3.png','Poster (placeholder)')"><img src="C:\Users\hp\Downloads\eco pic 3.png" alt="Poster (placeholder)" onerror="this.src=placeholderDataURL"/></div>
+              <div class="thumb" onclick="openLightbox('C:\Users\hp\Downloads\eco pic.png','Model (placeholder)')"><img src="C:\Users\hp\Downloads\eco pic.png" alt="Model (placeholder)" onerror="this.src=placeholderDataURL"/></div>
+              <div class="thumb" onclick="openLightbox('C:\Users\hp\Downloads\eco pic 2.png','Project Logo (placeholder)')"><img src="C:\Users\hp\Downloads\eco pic 2.png" alt="Logo (placeholder)" onerror="this.src=placeholderDataURL"/></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card poster-svg" aria-hidden="true">
+            <!-- The same poster SVG embedded inline (preview) -->
+            <div id="posterPreview" style="width:100%;height:100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-footer small">Poster designed (illustrative) — downloaded SVG is printable.</div>
+    </section>
+
+    <!-- Panel 6: SDGs -->
+    <section class="panel" id="p-sdg" aria-labelledby="t-sdg" role="region">
+      <div class="panel-inner">
+        <div class="left">
+          <div class="card">
+            <h2>SDG Alignment & Climate Programs</h2>
+            <p class="small muted">EcoConnect Bridge supports major sustainability goals — particularly energy access, sustainable infrastructure, sustainable cities, and climate action.</p>
+
+            <div class="grid-3" style="margin-top:12px">
+              <div class="card"><h4>SDG 7</h4><p class="small muted">Affordable & Clean Energy</p></div>
+              <div class="card"><h4>SDG 9</h4><p class="small muted">Industry, Innovation & Infrastructure</p></div>
+              <div class="card"><h4>SDG 11</h4><p class="small muted">Sustainable Cities & Communities</p></div>
+            </div>
+
+            <div style="margin-top:12px" class="small muted">
+              <strong>Funding & schemes:</strong> pilots can apply for national solar missions, smart-city grants, EV incentives and local green funds. Community sponsorship and education programs increase adoption.
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card">
+            <h3>Impact Metrics (sample)</h3>
+            <p class="small muted">A 200m pilot lane with PV + turbines + piezo could provide X kWh/year (depends on site). Pilots measure emissions avoided, user acceptance and total cost of ownership for cities.</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer small">Aligning design with policy & funding opportunities.</div>
+    </section>
+
+    <!-- Panel 7: Contact -->
+    <section class="panel" id="p-contact" aria-labelledby="t-contact" role="region">
+      <div class="panel-inner">
+        <div class="left">
+          <div class="card">
+            <h2>Contact & Get Involved</h2>
+            <p class="small muted">Interested in piloting EcoConnect? Want to sponsor or volunteer? Reach out — the demo form below is client-side only; replace with your backend or mailto.</p>
+            <form onsubmit="event.preventDefault(); alert('Thanks — demo form submitted. Replace with your server for real emails.');">
+              <input required placeholder="Name" style="padding:10px;border-radius:8px;border:1px solid #ddd;width:100%;margin-bottom:8px">
+              <input required type="email" placeholder="Email" style="padding:10px;border-radius:8px;border:1px solid #ddd;width:100%;margin-bottom:8px">
+              <textarea placeholder="Message" rows="5" style="padding:10px;border-radius:8px;border:1px solid #ddd;width:100%;"></textarea>
+              <div style="margin-top:10px;display:flex;gap:8px">
+                <button class="btn btn--green" type="submit">Send</button>
+                <button class="btn btn--blue" type="button" onclick="goTo(0)">Back to Home</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="card small muted">
+            <h4>Team</h4>
+            <p><strong>Member 1:</strong> Joshina Nameirakpam<br><strong>Member 2:</strong> Gehna Rana<br><strong>Member 3:</strong> Shristi Singh<br><strong>Member 4:</strong> Maira Panwar </p>
+
+            <div style="margin-top:8px">
+              <strong>QR / Hosting</strong>
+              <div class="small muted">When you publish to GitHub Pages I can generate a QR linking to your live site (with logo center).</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="panel-footer small">Thanks for building a cleaner future with us.</div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox" role="dialog" aria-hidden="true" onclick="closeLightbox(event)">
+  <div class="box" onclick="event.stopPropagation()">
+    <img id="lightbox-img" src="" alt="Expanded image"/>
+    <div style="text-align:right;margin-top:8px"><button onclick="closeLightbox(event)" style="padding:8px 12px;border-radius:8px;background:#064739;color:white;border:none">Close</button></div>
+  </div>
+</div>
+
+<script>
+/* ===============================
+   Single-file site controller JS
+   =============================== */
+
+/* Panel control */
+const panels = document.getElementById('panels');
+const panelCount = panels.children.length;
+let currentIndex = 0;
+const navLinks = document.querySelectorAll('.nav-link');
+const dots = document.querySelectorAll('.dot');
+
+function updateUI(){
+  panels.style.transform = `translateX(${-currentIndex * 100}vw)`;
+  // nav highlights
+  navLinks.forEach(a => a.classList.toggle('active', Number(a.dataset.index) === currentIndex));
+  dots.forEach(d => d.classList.toggle('active', Number(d.dataset.index) === currentIndex));
+}
+function goTo(i){
+  if(i < 0) i = 0;
+  if(i >= panelCount) i = panelCount - 1;
+  currentIndex = i;
+  updateUI();
+}
+document.querySelectorAll('.nav-link').forEach(a => {
+  a.addEventListener('click', e => { e.preventDefault(); goTo(Number(a.dataset.index)); });
+});
+dots.forEach(d => d.addEventListener('click', ()=> goTo(Number(d.dataset.index))));
+document.getElementById('prevBtn').addEventListener('click', ()=> goTo(currentIndex - 1));
+document.getElementById('nextBtn').addEventListener('click', ()=> goTo(currentIndex + 1));
+window.addEventListener('keydown', (e)=> { if(e.key === 'ArrowRight') goTo(currentIndex+1); if(e.key==='ArrowLeft') goTo(currentIndex-1); });
+
+/* Mobile swipe */
+let touchStartX = null;
+document.addEventListener('touchstart', (e)=> { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', (e)=> {
+  if(!touchStartX) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if(dx < -50) goTo(currentIndex+1);
+  if(dx > 50) goTo(currentIndex-1);
+  touchStartX = null;
+});
+
+/* Lightbox */
+function openLightbox(src){
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightbox-img');
+  img.src = src;
+  lb.style.display = 'flex';
+  lb.setAttribute('aria-hidden','false');
+}
+function closeLightbox(e){
+  const lb = document.getElementById('lightbox');
+  lb.style.display = 'none';
+  lb.setAttribute('aria-hidden','true');
+}
+document.querySelectorAll('.thumb').forEach(t => {
+  t.addEventListener('click', ()=>{
+    const img = t.querySelector('img');
+    openLightbox(img.src || img.getAttribute('data-src'));
+  });
+});
+
+/* Download brief */
+function downloadBrief(){
+  const content = `EcoConnect Bridge - Brief
+
+Tagline: Where motion transforms into clean power.
+
+Summary: EcoConnect integrates solar, wind, piezoelectric tiles and wireless charging lanes to generate and distribute clean energy on bridges. Phased rollout: pilot solar lane + storage + wireless strip.
+
+Contact: ecoconnect@example.org`;
+  const blob = new Blob([content], {type:'text/plain'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'EcoConnect_Brief.txt'; document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* Poster SVG (string) and "downloadPoster" utility */
+const posterSVG = `
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1800" viewBox="0 0 1200 1800">
+  <defs><linearGradient id="pg" x1="0" x2="1"><stop offset="0" stop-color="#07c77a"/><stop offset="1" stop-color="#39d0ff"/></linearGradient></defs>
+  <rect width="1200" height="1800" fill="#fff"/>
+  <rect x="40" y="40" width="1120" height="1720" rx="28" fill="#f7fff7" stroke="#e6f7ef" stroke-width="2"/>
+  <text x="100" y="160" font-size="56" font-weight="700" fill="#063b33">EcoConnect Bridge</text>
+  <text x="100" y="210" font-size="22" fill="#4e6e62">Powering Journeys — Sustaining Tomorrow</text>
+  <g transform="translate(80,320)">
+    <path d="M0 420 C160 40 760 40 920 420" stroke="#064739" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <rect x="8" y="420" rx="24" width="880" height="48" fill="url(#pg)"/>
+    <g transform="translate(180,380)" fill="#063">
+      <rect x="0" width="72" height="14" rx="3"/>
+      <rect x="180" width="72" height="14" rx="3"/>
+      <rect x="360" width="72" height="14" rx="3"/>
+      <rect x="540" width="72" height="14" rx="3"/>
+    </g>
+  </g>
+  <g transform="translate(100,820)" fill="#234f44">
+    <text x="0" y="0" font-size="22" font-weight="700">What it does</text>
+    <text x="0" y="50" font-size="18">• Harvests solar, wind & motion</text>
+    <text x="0" y="86" font-size="18">• Stores energy & supplies grid</text>
+    <text x="0" y="122" font-size="18">• Charges EVs wirelessly on-the-move</text>
+  </g>
+  <rect x="100" y="1360" rx="14" width="1000" height="140" fill="#07c77a"/>
+  <text x="120" y="1436" font-size="36" fill="#fff" font-weight="700">Join the pilot — build cleaner routes</text>
+  <text x="120" y="1478" font-size="18" fill="#e9fff0">Contact: ecoconnect@example.org</text>
+</svg>
+`.trim();
+
+function downloadPoster(){
+  const blob = new Blob([posterSVG], {type:'image/svg+xml'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'EcoConnect_Poster.svg'; document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* Poster preview injection */
+document.addEventListener('DOMContentLoaded', ()=>{
+  const p = document.getElementById('posterPreview');
+  if(p) p.innerHTML = posterSVG;
+});
+
+/* =========================
+   Floating leaf particles
+   (canvas drawing for performance; dynamic intensity toggle)
+   ========================= */
+const canvas = document.getElementById('leaf-canvas');
+const ctx = canvas.getContext('2d');
+let W = canvas.width = innerWidth;
+let H = canvas.height = innerHeight;
+window.addEventListener('resize', ()=>{ W = canvas.width = innerWidth; H = canvas.height = innerHeight; initParticles(); });
+
+let particles = [];
+let intensity = 'dynamic'; // 'subtle' or 'dynamic'
+const setIntensity = (v) => {
+  intensity = v;
+  document.getElementById('animToggle').textContent = (v==='dynamic'?'Dynamic':'Subtle');
+}
+document.getElementById('animToggle').addEventListener('click', ()=>{
+  setIntensity(intensity==='dynamic'?'subtle':'dynamic');
+});
+
+function rand(a,b){ return Math.random()*(b-a)+a; }
+function makeParticle(){
+  return {
+    x: rand(0,W),
+    y: rand(-H, H),
+    vx: rand(-0.6, 0.6),
+    vy: rand(0.3, 1.4),
+    r: rand(6, 20),
+    rot: rand(0, Math.PI*2),
+    vr: rand(-0.02, 0.02),
+    hue: rand(100, 170),
+    alpha: rand(0.6, 0.95)
+  };
+}
+function initParticles(){
+  particles = [];
+  const count = (intensity==='dynamic') ? Math.max(40, Math.floor(W/60)) : Math.max(18, Math.floor(W/160));
+  for(let i=0;i<count;i++) particles.push(makeParticle());
+}
+initParticles();
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // faint overlay
+  ctx.globalCompositeOperation = 'source-over';
+  for(let p of particles){
+    p.x += p.vx * (intensity==='dynamic'?1.6:0.8);
+    p.y += p.vy * (intensity==='dynamic'?1.6:0.8);
+    p.rot += p.vr;
+    if(p.y > H + 40 || p.x < -80 || p.x > W + 80){
+      Object.assign(p, makeParticle()); p.y = -20;
+    }
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    // leaf shape
+    ctx.beginPath();
+    ctx.moveTo(0, -p.r/2);
+    ctx.quadraticCurveTo(p.r*0.9, 0, 0, p.r/2);
+    ctx.quadraticCurveTo(-p.r*0.9, 0, 0, -p.r/2);
+    ctx.closePath();
+    ctx.fillStyle = `hsla(${p.hue}, 70%, 45%, ${p.alpha})`;
+    ctx.fill();
+    ctx.restore();
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* small placeholder fallback if assets missing */
+const placeholderDataURL = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='800' height='520'><rect width='100%' height='100%' fill='#e6fff0'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#063b33' font-size='22'>Image placeholder — add assets/poster.jpg or model.jpg</text></svg>`);
+
+/* initial UI update */
+updateUI();
+
+/* ensure clicking header links updates active dot */
+document.querySelectorAll('.top-nav a').forEach(a => a.addEventListener('click', (e) => {
+  e.preventDefault();
+  goTo(Number(a.dataset.index));
+}));
+
+/* Set initial intensity label */
+setIntensity('dynamic');
+</script>
+</body>
+</html>
